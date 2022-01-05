@@ -34,28 +34,44 @@ logger = logging.getLogger("Unmanic.Plugin.encoder_video_hevc_qsv")
 
 class Settings(PluginSettings):
     settings = {
-        "advanced":              False,
-        "max_muxing_queue_size": 2048,
-        "main_options":          "",
-        "advanced_options":      "",
-        "custom_options":        "",
-        "keep_container":        True,
-        "dest_container":        "mkv",
+        "advanced":                   False,
+        "max_muxing_queue_size":      2048,
+        "preset":                     "slow",
+        "tune":                       "film",
+        "encoder_ratecontrol_method": "LA_ICQ",
+        "constant_quantizer_scale":   "25",
+        "constant_quality_scale":     "23",
+        "average_bitrate":            "5",
+        "main_options":               "",
+        "advanced_options":           "-strict -2\n"
+                                      "-max_muxing_queue_size 2048\n",
+        "custom_options":             "-preset slow\n"
+                                      "-tune film\n"
+                                      "-global_quality 23\n"
+                                      "-look_ahead 1\n",
+        "keep_container":             True,
+        "dest_container":             "mkv",
     }
 
     def __init__(self):
         self.form_settings = {
-            "advanced":              {
+            "advanced":                   {
                 "label": "Write your own FFmpeg params",
             },
-            "max_muxing_queue_size": self.__set_max_muxing_queue_size_form_settings(),
-            "main_options":          self.__set_main_options_form_settings(),
-            "advanced_options":      self.__set_advanced_options_form_settings(),
-            "custom_options":        self.__set_custom_options_form_settings(),
-            "keep_container":        {
+            "max_muxing_queue_size":      self.__set_max_muxing_queue_size_form_settings(),
+            "preset":                     self.__set_preset_form_settings(),
+            "tune":                       self.__set_tune_form_settings(),
+            "encoder_ratecontrol_method": self.__set_encoder_ratecontrol_method_form_settings(),
+            "constant_quantizer_scale":   self.__set_constant_quantizer_scale_form_settings(),
+            "constant_quality_scale":     self.__set_constant_quality_scale_form_settings(),
+            "average_bitrate":            self.__set_average_bitrate_form_settings(),
+            "main_options":               self.__set_main_options_form_settings(),
+            "advanced_options":           self.__set_advanced_options_form_settings(),
+            "custom_options":             self.__set_custom_options_form_settings(),
+            "keep_container":             {
                 "label": "Keep the same container",
             },
-            "dest_container":        self.__set_destination_container(),
+            "dest_container":             self.__set_destination_container(),
         }
 
     def __set_max_muxing_queue_size_form_settings(self):
@@ -68,6 +84,163 @@ class Settings(PluginSettings):
             },
         }
         if self.get_setting('advanced'):
+            values["display"] = 'hidden'
+        return values
+
+    def __set_preset_form_settings(self):
+        values = {
+            "label":          "Encoder quality preset",
+            "input_type":     "select",
+            "select_options": [
+                {
+                    'value': "veryfast",
+                    'label': "Very fast - Fastest setting, biggest quality drop",
+                },
+                {
+                    'value': "faster",
+                    'label': "Faster - Close to medium/fast quality, faster performance",
+                },
+                {
+                    'value': "fast",
+                    'label': "Fast",
+                },
+                {
+                    'value': "medium",
+                    'label': "Medium - Balanced performance and quality",
+                },
+                {
+                    'value': "slow",
+                    'label': "Slow",
+                },
+                {
+                    'value': "slower",
+                    'label': "Slower - Close to 'very slow' quality, faster performance",
+                },
+                {
+                    'value': "veryslow",
+                    'label': "Very Slow - Best quality",
+                },
+            ],
+        }
+        if self.get_setting('advanced'):
+            values["display"] = 'hidden'
+        return values
+
+    def __set_tune_form_settings(self):
+        values = {
+            "label":          "Tune for a particular type of source or situation",
+            "input_type":     "select",
+            "select_options": [
+                {
+                    'value': "film",
+                    'label': "Film – use for high quality movie content; lowers deblocking",
+                },
+                {
+                    'value': "animation",
+                    'label': "Animation – good for cartoons; uses higher deblocking and more reference frames",
+                },
+                {
+                    'value': "grain",
+                    'label': "Grain – preserves the grain structure in old, grainy film material",
+                },
+                {
+                    'value': "stillimage",
+                    'label': "Still image – good for slideshow-like content",
+                },
+                {
+                    'value': "fastdecode",
+                    'label': "Fast decode – allows faster decoding by disabling certain filters",
+                },
+                {
+                    'value': "zerolatency",
+                    'label': "Zero latency – good for fast encoding and low-latency streaming",
+                },
+            ],
+        }
+        if self.get_setting('advanced'):
+            values["display"] = 'hidden'
+        return values
+
+    def __set_encoder_ratecontrol_method_form_settings(self):
+        values = {
+            "label":          "Encoder ratecontrol method",
+            "input_type":     "select",
+            "select_options": [
+                {
+                    'value': "CQP",
+                    'label': "CQP - Quality based mode using constant quantizer scale",
+                },
+                {
+                    'value': "ICQ",
+                    'label': "ICQ - Quality based mode using intelligent constant quality",
+                },
+                {
+                    'value': "LA_ICQ",
+                    'label': "LA_ICQ - Quality based mode using intelligent constant quality with lookahead",
+                },
+                {
+                    'value': "VBR",
+                    'label': "VBR - Bitrate based mode using variable bitrate",
+                },
+                {
+                    'value': "LA",
+                    'label': "LA - Bitrate based mode using VBR with lookahead",
+                },
+                {
+                    'value': "CBR",
+                    'label': "CBR - Bitrate based mode using constant bitrate",
+                },
+            ],
+        }
+        if self.get_setting('advanced'):
+            values["display"] = 'hidden'
+        return values
+
+    def __set_constant_quantizer_scale_form_settings(self):
+        # Lower is better
+        values = {
+            "label":          "Constant quantizer scale",
+            "input_type":     "slider",
+            "slider_options": {
+                "min": 0,
+                "max": 51,
+            },
+        }
+        if self.get_setting('advanced'):
+            values["display"] = 'hidden'
+        if self.get_setting('encoder_ratecontrol_method') != 'CQP':
+            values["display"] = 'hidden'
+        return values
+
+    def __set_constant_quality_scale_form_settings(self):
+        # Lower is better
+        values = {
+            "label":          "Constant quality scale",
+            "input_type":     "slider",
+            "slider_options": {
+                "min": 1,
+                "max": 51,
+            },
+        }
+        if self.get_setting('advanced'):
+            values["display"] = 'hidden'
+        if self.get_setting('encoder_ratecontrol_method') not in ['LA_ICQ', 'ICQ']:
+            values["display"] = 'hidden'
+        return values
+
+    def __set_average_bitrate_form_settings(self):
+        values = {
+            "label":          "Bitrate",
+            "input_type":     "slider",
+            "slider_options": {
+                "min":    1,
+                "max":    20,
+                "suffix": "M"
+            },
+        }
+        if self.get_setting('advanced'):
+            values["display"] = 'hidden'
+        if self.get_setting('encoder_ratecontrol_method') not in ['VBR', 'LA', 'CBR']:
             values["display"] = 'hidden'
         return values
 
@@ -179,6 +352,47 @@ class PluginStreamMapper(StreamMapper):
                 '-c:v:{}'.format(stream_id), 'hevc_qsv',
             ]
 
+            # Add the preset and tune
+            stream_encoding += [
+                '-preset', str(settings.get_setting('preset')),
+                '-tune', str(settings.get_setting('tune')),
+            ]
+
+            if settings.get_setting('encoder_ratecontrol_method') in ['CQP', 'LA_ICQ', 'ICQ']:
+                # Configure QSV encoder with a quality-based mode
+                if settings.get_setting('encoder_ratecontrol_method') == 'CQP':
+                    # Set values for constant quantizer scale
+                    stream_encoding += [
+                        '-q', str(settings.get_setting('constant_quantizer_scale')),
+                    ]
+                elif settings.get_setting('encoder_ratecontrol_method') in ['LA_ICQ', 'ICQ']:
+                    # Set the global quality
+                    stream_encoding += [
+                        '-global_quality', str(settings.get_setting('constant_quality_scale')),
+                    ]
+                    # Set values for constant quality scale
+                    if settings.get_setting('encoder_ratecontrol_method') == 'LA_ICQ':
+                        # Add lookahead
+                        stream_encoding += [
+                            '-look_ahead', '1',
+                        ]
+            else:
+                # Configure the QSV encoder with a bitrate-based mode
+                # Set the max and average bitrate (used by all bitrate-based modes)
+                stream_encoding += [
+                    '-b:v:{}'.format(stream_id), '{}M'.format(settings.get_setting('average_bitrate')),
+                ]
+                if settings.get_setting('encoder_ratecontrol_method') == 'LA':
+                    # Add lookahead
+                    stream_encoding += [
+                        '-look_ahead', '1',
+                    ]
+                elif settings.get_setting('encoder_ratecontrol_method') == 'CBR':
+                    # Add 'maxrate' with the same value to make CBR mode
+                    stream_encoding += [
+                        '-maxrate', '{}M'.format(settings.get_setting('average_bitrate')),
+                    ]
+
         return {
             'stream_mapping':  ['-map', '0:v:{}'.format(stream_id)],
             'stream_encoding': stream_encoding,
@@ -196,8 +410,6 @@ class PluginStreamMapper(StreamMapper):
             "-filter_hw_device": "hw",
         }
         self.set_ffmpeg_generic_options(**generic_kwargs)
-        # Use 'NV12' for hardware surfaces. I would think that 10-bit encoding encoding using
-        #   the P010 input surfaces is an advanced feature
         advanced_kwargs = {
             "-vf": "hwupload=extra_hw_frames=64,format=qsv",
         }

@@ -24,6 +24,47 @@ This option sets the size of this buffer, in packets, for the matching output st
 FFmpeg docs refer to this value as '-max_muxing_queue_size'
 
 
+#### <span style="color:blue">Encoder quality preset</span>
+Select the quality profile for the QSV encoder to use.
+- [Intel Quicksync FFmpeg Whitepaper](https://www.intel.com/content/dam/www/public/us/en/documents/white-papers/cloud-computing-quicksync-video-ffmpeg-white-paper.pdf)
+- [FFmpeg Preset](https://trac.ffmpeg.org/wiki/Encode/H.264#Preset)
+
+
+#### <span style="color:blue">Tune for a particular type of source or situation</span>
+Tune the output settings based on the specifics of your input.
+- [FFmpeg Tune](https://trac.ffmpeg.org/wiki/Encode/H.264#Tune)
+
+
+#### <span style="color:blue">Encoder ratecontrol method</span>
+Select the encoder ratecontrol method. Some encoder modes are quality-based while others are bitrate-based.
+
+<div style="background-color:#eee;border-radius:4px;border-left:solid 5px #ccc;padding:10px;">
+<b>Note:</b>
+<br>Not all modes are added to this Plugin.
+<br>I have selected the most common in order to simplify the configuration of this Plugin.
+</div>
+<br>
+<div style="background-color:#cfd;border-radius:4px;border-left:solid 5px #2b4;padding:10px;">
+<b>Tip:</b>
+<br>Set a quality-based control to have FFmpeg attempt to match the quality of the source file at a lower bitrate.
+</div>
+
+- [FFmpeg QSV encoders](https://www.ffmpeg.org/ffmpeg-codecs.html#QSV-encoders)
+
+
+#### <span style="color:blue">Constant quantizer/quality scale</span>
+Available when configuring the ratecontrol using a quality-based method.
+
+Lower values will produce better quality with 1 being close to the source quality.
+
+
+#### <span style="color:blue">Bitrate</span>
+Available when configuring the ratecontrol using a bitrate-based method.
+
+The target (average) bit rate for the encoder to use. If CBR is selected as the ratecontrol method,
+then this target will be made constant rather than just an average.
+
+
 #### <span style="color:blue">Overwrite all options with custom input</span>
 This free text input allows you to write any FFmpeg params that you want. 
 This is for more advanced use cases where you need finer control over the file transcode.
